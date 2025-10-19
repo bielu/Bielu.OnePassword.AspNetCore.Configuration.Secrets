@@ -28,7 +28,7 @@ The secrets will be loaded from the OnePassword Connect endpoint. The names will
     ```
 ## Examples
 
-To load initialize configuration from Azure Key Vault secrets call the `AddAzureKeyVault` on `ConfigurationBuilder`:
+To load initialize configuration from One Password connect secrets call the `AddOnePasswordConnect` on `ConfigurationBuilder`:
 
 ```C# Snippet:ConfigurationAddAzureKeyVault
 ConfigurationBuilder builder = new ConfigurationBuilder();
