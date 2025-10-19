@@ -76,7 +76,31 @@ public class OnePasswordConnectConfigurationProvider(
         }
     }
 
-    private static Dictionary<string, string?> ConvertToEnvSecrets(Dictionary<string, FullItem> values) => values.ToDictionary(x => KeyToDotnetFormat(x.Key), x => x.Value.Fields?.FirstOrDefault(x=>x.Label == "dotnetSecret")?.Value);
+    private static Dictionary<string, string?> ConvertToEnvSecrets(Dictionary<string, FullItem> values)
+    {
+        var dict = new Dictionary<string, string?>();
+        var keys = new List<string>();
+        foreach (var (key, value) in values)
+        {
+            var dotnetKey = KeyToDotnetFormat(key);
+            //avoid duplicate keys
+            if (keys.Contains(dotnetKey))
+            {
+                var number = keys.Count(x => x.StartsWith(dotnetKey, StringComparison.InvariantCultureIgnoreCase));
+                dotnetKey = $"{dotnetKey}:{number+1}";
+            }
+            keys.Add(dotnetKey);
+            var secretField = value.Fields?.ToDictionary(x=>$"{dotnetKey}:{KeyToDotnetFormat(x.Label ?? x.Id)}", x=>x.Value);
+            if (secretField != null)
+            {
+                foreach (var field in secretField)
+                {
+                    dict.Add(field.Key, field.Value);
+                }
+            }
+        }
+        return dict;
+    }
 
     private static string KeyToDotnetFormat(string argKey) => argKey.Replace(".", ":").Replace(" ", ":");
 
